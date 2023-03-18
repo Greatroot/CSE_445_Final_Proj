@@ -26,15 +26,17 @@ For the MediaPipe landmark data that Google’s ISLR Competition, I use several 
 
 Those previous works have been tested on a large set Word-Level Sign Language dataset with 2000 classes where a skeleton-mapping has been extracted from each video using OpenPose (the results of which are around 60 to 70% accuracy), but they all have yet to be tested on Google and RIT’s ISLR Competition dataset, which includes baby signs. These methods have also yet to be tested on landmarks that have been extracted from MediaPipe, which has significantly more landmark points (543) compared to OpenPose (55 landmarks). For this project, I attempted to test the ISLR dataset on Pose-LSTM, Pose-TGCN, and SPOTER in Kaggle Notebook.
 
-	Due to the incredibly large size of the dataset, I spent a lot of time trying to pre-load a scaled-down version of the data into a numpy array. This was due to the fact that Kaggle Notebook only allowed for 13 GigaBytes of ram, and the entire dataset with padding was around 20 to 30 GB. As the face isn’t often used in baby signs, I removed the face-landmarks from the data and reduced the number of landmarks per frame from 468 + 21 + 33 + 21 = 543 to 21 + 33 + 21 = 75 landmarks. The number of frames in each video varied, so preprocessing was needed to pad each video so that they all had the same number of frames (which would allow for batch training). The number of frames ranged from 6 to 537, but the majority of videos ranged between 6 to 50 frames. To reduce the amount of data even more so I could preload it, I only allowed videos with 20 frames or less. In the end, my preprocessed dataset had around 43,993 training instances compared to the original 94,477. I would have used a pre-trained version of Pose-TGCN and SPOTER, but the only pre-trained models available were ones that were pre trained on WLASL with landmarks extracted using OpenPose, which uses different landmarks than MediaPipe. This was all the pre-processing done for Pose-LSTM and Pose-TGCN.
+Due to the incredibly large size of the dataset, I spent a lot of time trying to pre-load a scaled-down version of the data into a numpy array. This was due to the fact that Kaggle Notebook only allowed for 13 GigaBytes of ram, and the entire dataset with padding was around 20 to 30 GB. As the face isn’t often used in baby signs, I removed the face-landmarks from the data and reduced the number of landmarks per frame from 468 + 21 + 33 + 21 = 543 to 21 + 33 + 21 = 75 landmarks. The number of frames in each video varied, so preprocessing was needed to pad each video so that they all had the same number of frames (which would allow for batch training). 
+
+The number of frames ranged from 6 to 537, but the majority of videos ranged between 6 to 50 frames. To reduce the amount of data even more so I could preload it, I only allowed videos with 20 frames or less. In the end, my preprocessed dataset had around 43,993 training instances compared to the original 94,477. I would have used a pre-trained version of Pose-TGCN and SPOTER, but the only pre-trained models available were ones that were pre trained on WLASL with landmarks extracted using OpenPose, which uses different landmarks than MediaPipe. This was all the pre-processing done for Pose-LSTM and Pose-TGCN.
   
-	A little bit more pre-processing was done for the SPOTER model. In Boháček et al., SPOTER incorporates Sign Language linguistic properties using a unique normalization process. Each sign is usually made within the "Signing Space" (what literature notes as SS), which is a 3D space between the waist and slightly above the signer's head, spanning transversely from elbow to elbow when both arms are kept loosely bent, and spanning outwards as far as the signer can reach. Bounding boxes are found for the signing space (SS), the left hand, and the right hand and all of the landmarks detected are filtered out depending on whether they are actually in the signing space. Each landmark is also normalized to be relative to their respective bounding boxes (e.g. left-hand landmarks are now (x, y, z) with respect to the coordinate system of the left-hand bounding box). In our code, we do not normalize the data.
+A little bit more pre-processing was done for the SPOTER model. In Boháček et al., SPOTER incorporates Sign Language linguistic properties using a unique normalization process. Each sign is usually made within the "Signing Space" (what literature notes as SS), which is a 3D space between the waist and slightly above the signer's head, spanning transversely from elbow to elbow when both arms are kept loosely bent, and spanning outwards as far as the signer can reach. Bounding boxes are found for the signing space (SS), the left hand, and the right hand and all of the landmarks detected are filtered out depending on whether they are actually in the signing space. Each landmark is also normalized to be relative to their respective bounding boxes (e.g. left-hand landmarks are now (x, y, z) with respect to the coordinate system of the left-hand bounding box). In our code, we do not normalize the data.
   
-	However, we do follow Boháček et al. in augmenting the frames in each video by randomly choosing one of three different transforms to apply to every frame: (1) in-plane rotation, (2) squeeze, and (3) perspective transform. This helps prevent overfitting and boosts generalization capability since we are diversifying our data through transformations/noise.
+However, we do follow Boháček et al. in augmenting the frames in each video by randomly choosing one of three different transforms to apply to every frame: (1) in-plane rotation, (2) squeeze, and (3) perspective transform. This helps prevent overfitting and boosts generalization capability since we are diversifying our data through transformations/noise.
 
 ## Results:
 
-	Unfortunately, I was unable to get any of the three models to work in time. There are no conclusive results to show.
+Unfortunately, I was unable to get any of the three models to work in time. There are no conclusive results to show.
 
 ## Discussion:
 
@@ -46,9 +48,12 @@ For the SPOTER network, future work could also include trying to use the normali
 Citation:
 
 Li, D., Rodriguez, C., Yu, X., & Li, H. (2020). Word-level deep sign language recognition from video: A 
-\tnew large-scale dataset and methods comparison. In Proceedings of the IEEE/CVF winter conference on \tapplications of computer vision (pp. 1459-1469).
+     new large-scale dataset and methods comparison. In Proceedings of the IEEE/CVF winter conference on 
+     applications of computer vision (pp. 1459-1469).
+
 Boháček, M., & Hrúz, M. (2022). Sign pose-based transformer for word-level sign language recognition. In 
-Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (pp. 182-191).
+     Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (pp. 182-191).
+
 Duan, H., Zhao, Y., Chen, K., Lin, D., & Dai, B. (2022). Revisiting skeleton-based action recognition. In 
-Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 2969-2978).
+     Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 2969-2978).
 
